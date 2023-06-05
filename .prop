@@ -1,1 +1,1 @@
-{label = "OpenOS", reboot=true, setlabel=true, setboot=true}
+{label = "mOS", reboot=true, setlabel=true, setboot=true}
