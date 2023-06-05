@@ -45,4 +45,4 @@ If you would like to contribute to mOS, you can follow these steps:
 5. Open a pull request on the original mOS repository and provide a detailed description of your changes.
 
 ## License
-We use the MIT license
+We use the MIT license for mOS. You can see it [here](https://github.com/Why2312/mOS/blob/main/LICENSE).
