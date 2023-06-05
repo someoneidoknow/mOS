@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-LTS versions are supported for 6 months after their release,
+LTS versions are supported for 6 months after a new version is released,
 Normal versions are supported for only 1 month,
 and the Beta versions are supported for 2 weeks.
 

@@ -44,5 +44,20 @@ If you would like to contribute to mOS, you can follow these steps:
 
 5. Open a pull request on the original mOS repository and provide a detailed description of your changes.
 
+## Version standard
+
+Major updates (x.0.0) mean a very large edit or creation in the codebase of mOS. 
+
+Code may not be compatible between major updates, and the previous major update is instantly invalidated for security updates unless it is an LTS release
+
+
+Minor updates (1.x.0) mean a small edit or creation in the codebase of mOS.
+
+Between minor updates, programs are very likely to be compatible with mOS and each other.
+
+Patch updates (1.0.x) mean a patch in the mOS codebase.
+
+Updates like these mean a small security fix, or a bug fix.
+
 ## License
 We use the MIT license for mOS. You can see it [here](https://github.com/Why2312/mOS/blob/main/LICENSE).
