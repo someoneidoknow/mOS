@@ -108,12 +108,10 @@ end
 -- Mount the ROM and temporary file systems to allow working on the file
 -- system module from this point on.
 require("filesystem").mount(computer.getBootAddress(), "/")
-
 -- Run library startup scripts. These mostly initialize event handlers.
 local function rom_invoke(method, ...)
   return component.invoke(computer.getBootAddress(), method, ...)
 end
-
 local scripts = {}
 for _, file in ipairs(rom_invoke("list", "boot")) do
   local path = "boot/" .. file
@@ -124,23 +122,27 @@ end
 table.sort(scripts)
 for i = 1, #scripts do
   dofile(scripts[i])
+  status("Loading script "..i.."/"..#scripts)
 end
 
 for c, t in component.list() do
   computer.pushSignal("component_added", c, t)
 end
+status(" ")
 status("Allocating RAM")
 os.sleep(1) -- Allow signal processing by libraries.
 status("PC Information:")
-ram = tostring(tonumber(computer.totalMemory()) / 1024)
-ramfree = tonumber(computer.freeMemory()) / 1024 - 128
-if ramfree < 0 then
+ram = tonumber(computer.totalMemory()) / 1024
+ramfree = tonumber(computer.freeMemory()) / 1024 - 2048
+if ramfree < 128 then
   ramfree = 0
   status("WARNING: Critically low RAM!")
-  -- Run garbage collection to attempt to free up some RAM
-  collectgarbage("collect")
+end
+if ram < 640 then
+  status("WARNING: mOS may not work properly with less than 640K RAM!")
 end
 ramfree = tostring(ramfree)
+ram = tostring(ram)
 status("Total RAM: "..ram.."K")
 status("Free RAM: "..ramfree.."K")
 status("Uptime: "..math.floor(computer.uptime()).."s")

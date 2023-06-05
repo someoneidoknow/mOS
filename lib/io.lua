@@ -34,9 +34,9 @@ function io.lines(filename, ...)
   end
 end
 
-function io.open(path, shell, mode)
+function io.open(path,mode)
   -- These requires are not on top because this is a bootstrapped file.
-  local resolved_path = shell.resolve(path)
+  local resolved_path = require("shell").resolve(path)
   local stream, result = require("filesystem").open(resolved_path, mode)
   if stream then
     return require("buffer").new(mode, stream)

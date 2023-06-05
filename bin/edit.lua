@@ -1,5 +1,6 @@
 local fs = require("filesystem")
 local keyboard = require("keyboard")
+local shell = require("shell")
 local term = require("term") -- TODO use tty and cursor position instead of global area and gpu
 local text = require("text")
 local unicode = require("unicode")
@@ -10,7 +11,7 @@ end
 local gpu = term.gpu()
 local args, options = shell.parse(...)
 if #args == 0 then
-  io.write("Usage: edit <filename>\n")
+  io.write("Usage: edit <filename>")
   return
 end
 
@@ -35,8 +36,12 @@ end
 local function loadConfig()
   -- Try to load user settings.
   local env = {}
+  local config = loadfile("/etc/edit.cfg", nil, env)
+  if config then
+    pcall(config)
+  end
   -- Fill in defaults.
-  env.keybinds = {
+  env.keybinds = env.keybinds or {
     left = {{"left"}},
     right = {{"right"}},
     up = {{"up"}},
@@ -58,6 +63,21 @@ local function loadConfig()
     cut = {{"control", "k"}},
     uncut = {{"control", "u"}}
   }
+  -- Generate config file if it didn't exist.
+  if not config then
+    local root = fs.get("/")
+    if root and not root.isReadOnly() then
+      fs.makeDirectory("/etc")
+      local f = io.open("/etc/edit.cfg", "w")
+      if f then
+        local serialization = require("serialization")
+        for k, v in pairs(env) do
+          f:write(k.."="..tostring(serialization.serialize(v, math.huge)).."\n")
+        end
+        f:close()
+      end
+    end
+  end
   return env
 end
 
@@ -524,7 +544,7 @@ local keyBindHandlers = {
     if not fs.exists(file_parentpath) then
       fs.makeDirectory(file_parentpath)
     end
-    local f, reason = io.open(filename, shell, "w")
+    local f, reason = io.open(filename, "w")
     if f then
       local chars, firstLine = 0, true
       for _, bline in ipairs(buffer) do
@@ -643,7 +663,7 @@ end
 -------------------------------------------------------------------------------
 
 do
-  local f = io.open(filename, shell)
+  local f = io.open(filename)
   if f then
     local x, y, w, h = getArea()
     local chars = 0

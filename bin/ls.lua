@@ -1,13 +1,18 @@
-args,ops = shell.parse(...)
+-- load complex, if we can (might be low on memory)
 
-if not args[1] then
-    local listing = ls(path)
-    listing = formatListing(listing)
-    io.write(listing)
-    return
+local ok, why = pcall(function(...)
+  return loadfile("/lib/core/full_ls.lua", "bt", _G)(...)
+end, ...)
+
+if not ok then
+  if type(why) == "table" then
+    if why.code == 0 then
+      return
+    end
+    why = why.reason
+  end
+  io.stderr:write(tostring(why) .. "\nFor low memory systems, try using `list` instead\n")
+  return 1
 end
 
-local path = shell.resolve(args[1])
-local listing = ls(path)
-listing = formatListing(listing)
-io.write(listing)
+return why

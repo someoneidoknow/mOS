@@ -1,48 +1,51 @@
-local filesystem = require("filesystem")
-local args = {...}
+local shell = require("shell")
+local fs = require("filesystem")
 
-if args[1] == "" then
-    print("Usage: cd <path>")
-    return
+local args, ops = shell.parse(...)
+local path = nil
+local verbose = false
+
+if ops.help then
+  print(
+[[Usage cd [dir]
+For more options, run: man cd]])
+  return
 end
 
-local function findPreviousPath(path)
-    -- Remove trailing slashes if any
-    path = path:gsub("/$", "")
-    
-    -- Split the path into individual components
-    local components = {}
-    for component in path:gmatch("[^/]+") do
-        table.insert(components, component)
-    end
-    
-    -- Remove the last component
-    table.remove(components)
-    
-    -- Join the remaining components to form the previous path
-    local previousPath = "/" .. table.concat(components, "/")
-    
-    return previousPath
+if #args == 0 then
+  local home = os.getenv("HOME")
+  if not home then
+    io.stderr:write("cd: HOME not set\n")
+    return 1
+  end
+  path = home
+elseif args[1] == '-' then
+  verbose = true
+  local oldpwd = os.getenv("OLDPWD");
+  if not oldpwd then
+    io.stderr:write("cd: OLDPWD not set\n")
+    return 1
+  end
+  path = oldpwd
+else
+  path = args[1]
 end
-if args[1] == ".." then
-    if path == "/" then
-        return
-    end
-    chdir(findPreviousPath(path))
-    return
+
+local resolved = shell.resolve(path)
+if not fs.exists(resolved) then
+  io.stderr:write("cd: ",path,": No such file or directory\n")
+  return 1
 end
-local path1 = shell.resolve(args[1])
-print(path1)
-if not filesystem.exists(path1) then
-    if filesystem.exists(path.."/"..args[1]) and filesystem.isDirectory(path.."/"..args[1]) then
-        if path == "/" then
-            chdir("/"..args[1])
-        else
-            chdir(path.."/"..args[1])
-        end
-        return
-    end
-    print("No such file or directory")
-    return
+
+path = resolved
+local oldpwd = shell.getWorkingDirectory()
+local result, reason = shell.setWorkingDirectory(path)
+if not result then
+  io.stderr:write("cd: ", path, ": ", reason)
+  return 1
+else
+  os.setenv("OLDPWD", oldpwd)
 end
-chdir(path1)
+if verbose then
+  os.execute("pwd")
+end

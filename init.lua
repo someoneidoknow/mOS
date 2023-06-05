@@ -6,6 +6,8 @@ do
   gpu.setResolution(gpu.maxResolution())
   gpu.setBackground(0x000000)
   gpu.setForeground(0xFFFFFF)
+  local w, h = gpu.maxResolution()
+  gpu.fill(1, 1, w, h, " ")
   -- Draw the mOS logo
   gpu.set(1, 1, "mOS loader 1.0")
   computer.pullSignal(2)
@@ -45,10 +47,9 @@ end
 while true do
   computer = require("computer")
   component = require("component")
-  -- Load mBOOT.lua config
-  local config = loadfile("/etc/mBOOT.lua")()
-  local filetoexec = config.bootfile
-  local reason, err = xpcall(loadfile(filetoexec), debug.traceback)
+  local reason, err = xpcall(require("shell").getShell(), function(msg)
+    return tostring(msg).."\n"..debug.traceback()
+  end)
   local gpu = component.gpu
   if not reason then
     w,h = gpu.getResolution()
@@ -58,8 +59,8 @@ while true do
       err = "Could not find file " .. filetoexec .. " to boot. mOS may be corrupted."
     end
     computer.beep(1350, 1.6)
-    gpu.set(1, 1, "Error: " .. err)
-    gpu.set(1, 2,"Press any key or click to retry")
+    io.write("\rError: " .. err)
+    gpu.set(1, h,"Press any key or click to retry")
     os.sleep(0.5)
     while true do
       local event, _, _, key = computer.pullSignal()
