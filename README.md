@@ -10,6 +10,8 @@ mOS is specifically designed to run on Open Computers hardware, targeting Tier 2
 - RAM: Minimum 640K, recommended 1024K
 - Disk: 640KB (Floppy or HDD)
 
+These specifications have been deemed the requirement based on real hardware tests (on a local minecraft server, running on the E2E modpack)
+
 ## Installation
 
 To install mOS on your Open Computers system, follow these steps:
