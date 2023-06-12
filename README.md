@@ -62,4 +62,4 @@ Patch updates (1.0.x) mean a patch in the mOS codebase.
 Updates like these mean a small security fix, or a bug fix.
 
 ## License
-We use the MIT license for mOS. You can see it [here](https://github.com/Why2312/mOS/blob/main/LICENSE).
+We use the GNU GPL v3 license for mOS. You can see it [here](https://github.com/Why2312/mOS/blob/main/LICENSE).
