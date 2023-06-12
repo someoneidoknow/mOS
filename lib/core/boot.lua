@@ -133,10 +133,11 @@ status("Allocating RAM")
 os.sleep(1) -- Allow signal processing by libraries.
 status("PC Information:")
 ram = tonumber(computer.totalMemory()) / 1024
-ramfree = tonumber(computer.freeMemory()) / 1024 - 2048
+ramfree = tonumber(computer.freeMemory()) / 1024
 if ramfree < 128 then
   ramfree = 0
   status("WARNING: Critically low RAM!")
+  for i=1,20 do os.sleep(0) end -- Clear the ram
 end
 if ram < 640 then
   status("WARNING: mOS may not work properly with less than 640K RAM!")

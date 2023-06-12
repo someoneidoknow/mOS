@@ -19,11 +19,11 @@ do
   
   -- Define the notes and their corresponding frequencies and durations
   local notes = {
-    { frequency = 523.25, duration = 0.1 },
-    { frequency = 659.25, duration = 0.1 },
-    { frequency = 783.99, duration = 0.2 },
-    { frequency = 880, duration = 0.1 },
-    { frequency = 659.25, duration = 0.1 }
+    { frequency = 423.25, duration = 0.1 },
+    { frequency = 559.25, duration = 0.1 },
+    { frequency = 683.99, duration = 0.2 },
+    { frequency = 780, duration = 0.1 },
+    { frequency = 559.25, duration = 0.1 }
   }
   
   -- Play the notes one by one
@@ -45,29 +45,18 @@ do
 end
 
 while true do
-  computer = require("computer")
-  component = require("component")
   local reason, err = xpcall(require("shell").getShell(), function(msg)
     return tostring(msg).."\n"..debug.traceback()
   end)
   local gpu = component.gpu
   if not reason then
     w,h = gpu.getResolution()
-    gpu.fill(1, 1, w, h, " ")
-    -- Detect if error starts with "attempt to call a nil value"
-    if err:sub(1, 27) == "attempt to call a nil value" then
-      err = "Could not find file " .. filetoexec .. " to boot. mOS may be corrupted."
-    end
     computer.beep(1350, 1.6)
-    io.write("\rError: " .. err)
-    gpu.set(1, h,"Press any key or click to retry")
-    os.sleep(0.5)
-    while true do
-      local event, _, _, key = computer.pullSignal()
-      -- Key down or mouse click
-      if event == "key_down" or event == "touch" then
-        break
-      end
+    gpu.fill(1, 1, w, h, " ")
+    if not require("shell").getShell() then
+      error("Shell not found")
+    else
+      error(err)
     end
   end
 end
