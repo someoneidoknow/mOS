@@ -8,8 +8,6 @@ do
   gpu.setForeground(0xFFFFFF)
   local w, h = gpu.maxResolution()
   gpu.fill(1, 1, w, h, " ")
-  -- Draw the mOS logo
-  gpu.set(1, 1, "mOS loader 1.0")
   computer.pullSignal(2)
   local function playNote(frequency, duration)
     computer.beep(frequency, duration * 1.7)

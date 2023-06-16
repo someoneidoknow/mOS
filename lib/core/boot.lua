@@ -1,7 +1,7 @@
 -- called from /init.lua
 local raw_loadfile = ...
 
-_G._OSVERSION = "mOS 1.0.0"
+_G._OSVERSION = "mOS 1.2.0"
 
 -- luacheck: globals component computer unicode _OSVERSION
 local component = component
@@ -122,34 +122,50 @@ end
 table.sort(scripts)
 for i = 1, #scripts do
   dofile(scripts[i])
-  status("Loading script "..i.."/"..#scripts)
 end
 
 for c, t in component.list() do
   computer.pushSignal("component_added", c, t)
 end
-status(" ")
-status("Allocating RAM")
+
 os.sleep(1) -- Allow signal processing by libraries.
-status("PC Information:")
+local logo = io.open("/etc/logo.txt", "r")
+local data = logo.read(logo, 30)
+repeat
+  io.write(data)
+  os.sleep(0.05)
+  data = logo.read(logo, 30)
+until not data
+if computer.uptime() > 10 then -- Probably rebooting.
+  io.write("Reboot detected, loading shell...\n")
+  os.sleep(1)
+  return
+end
+io.write("PC Information:\n")
 ram = tonumber(computer.totalMemory()) / 1024
 ramfree = tonumber(computer.freeMemory()) / 1024
 if ramfree < 128 then
   ramfree = 0
-  status("WARNING: Critically low RAM!")
+  io.write("WARNING: Critically low RAM!\n")
   for i=1,20 do os.sleep(0) end -- Clear the ram
 end
 if ram < 640 then
-  status("WARNING: mOS may not work properly with less than 640K RAM!")
+  io.write("WARNING: mOS may not work properly with less than 640K RAM!\n")
 end
 ramfree = tostring(ramfree)
 ram = tostring(ram)
-status("Total RAM: "..ram.."K")
-status("Free RAM: "..ramfree.."K")
-status("Uptime: "..math.floor(computer.uptime()).."s")
-status("Computer Resolution: "..w.."x"..h)
-status(" ")
-os.sleep(3)
+
+
+io.write("Total RAM: "..ram.."K\n")
+io.write("Free RAM: "..ramfree.."K\n")
+io.write("Uptime: "..math.floor(computer.uptime()).."s\n")
+io.write("Computer Resolution: "..w.."x"..h.."\n")
+io.write("CPU Type: ".._VERSION.."\n")
+io.write("Computer Address: "..computer.address().."\n")
+io.write("Boot filesystem: ".. computer.getBootAddress().."\n")
+io.write("Press any key to boot or wait 5 seconds.\n")
+
+computer.pullSignal(5, "key_down")
 
 computer.pushSignal("init") -- so libs know components are initialized.
 require("event").pull(1, "init") -- Allow init processing.
